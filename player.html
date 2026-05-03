@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    /* Ambient background reacts to current track */
+    /* reacts to current track */
     .player-ambient {
       position: fixed;
       inset: 0;
@@ -31,7 +31,7 @@
       .player-layout { grid-template-columns: 1fr; }
     }
 
-    /* ── Album Art ── */
+    /*  Art  */
     .album-art {
       width: 100%;
       aspect-ratio: 1;
@@ -55,7 +55,7 @@
       pointer-events: none;
     }
 
-    /* ── Track info ── */
+    /*  Track info  */
     .now-track-title {
       font-size: 1.6rem;
       font-weight: 800;
@@ -70,7 +70,7 @@
       font-weight: 500;
     }
 
-    /* ── Progress ── */
+    /*  Progress  */
     .progress-wrap {
       position: relative;
       height: 4px;
@@ -111,7 +111,7 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* ── Control buttons ── */
+    /*  Control buttons  */
     .ctrl-row {
       display: flex;
       align-items: center;
@@ -154,7 +154,7 @@
 
     .ctrl-btn-play:hover { transform: scale(1.06); background: rgba(255,255,255,0.9); }
 
-    /* ── Volume ── */
+    /*  Volume  */
     .volume-row {
       display: flex;
       align-items: center;
@@ -180,7 +180,7 @@
       cursor: pointer;
     }
 
-    /* ── Queue panel ── */
+    /*  Queue panel  */
     .queue-header {
       font-size: 0.75rem;
       font-weight: 700;
@@ -256,11 +256,11 @@
   <div class="container pt-4">
     <div class="player-layout">
 
-      <!-- ── LEFT: PLAYER ── -->
+      <!--  Left : Player  -->
       <div>
         <!-- Album Art -->
         <div class="album-art mb-4" id="albumArt">🎤</div>
-        <!-- Accessible image reference for rubric alt-tag requirement -->
+        <!-- Accessible image; alt-tag requirement -->
         <img src="images/album-hiphop.svg" alt="Album artwork for current playing track" style="display:none;" id="albumImgRef" />
 
         <!-- Track Info -->
@@ -305,7 +305,7 @@
         </div>
       </div>
 
-      <!-- ── RIGHT: QUEUE ── -->
+      <!--  Right: Queue  -->
       <div>
         <p class="queue-header">Up Next</p>
         <div id="queueList"></div>
