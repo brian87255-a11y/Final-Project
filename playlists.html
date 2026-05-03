@@ -1,0 +1,230 @@
+<!-- DEVELOPER: Brian Rivera, IS117-002, Spring 2026 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2000s Music — Playlists</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Featured Playlist Hero ── */
+    .playlist-hero-card {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      position: relative;
+      min-height: 280px;
+      display: flex;
+      align-items: flex-end;
+      padding: 2.5rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .playlist-hero-card:hover { transform: scale(1.01); }
+
+    .playlist-hero-card .ph-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .playlist-hero-card .ph-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+      z-index: 1;
+    }
+
+    .playlist-hero-card .ph-content { position: relative; z-index: 2; }
+
+    .playlist-hero-card .ph-emoji {
+      position: absolute;
+      right: 2.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 5rem;
+      opacity: 0.2;
+      z-index: 2;
+    }
+
+    /* ── Playlist Grid Card ── */
+    .playlist-grid-card {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .playlist-grid-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .playlist-grid-card .pg-art {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .playlist-grid-card .pg-art .pg-play {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 40px; height: 40px;
+      background: var(--text-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg);
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    .playlist-grid-card:hover .pg-play { opacity: 1; transform: translateY(0); }
+
+    .playlist-grid-card .pg-body { padding: 0.9rem 1rem; }
+    .playlist-grid-card .pg-title { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); letter-spacing:-0.01em; margin-bottom:3px; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .playlist-grid-card .pg-sub   { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* ── Track Preview ── */
+    .preview-list { margin-top: 0.5rem; }
+    .preview-track { display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border); }
+    .preview-track:last-child { border-bottom: none; }
+    .preview-dot { width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0; }
+    .preview-track-name { font-size:0.78rem;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div id="navbar-placeholder"></div>
+
+<div class="page-wrapper flex-grow-1">
+  <div class="container">
+
+    <div class="page-hero anim-fade-up">
+      <span class="eyebrow mb-2 d-block">Curated Collections</span>
+      <h1 style="font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-0.04em;">Playlists</h1>
+      <p style="color:var(--text-secondary);margin-top:0.5rem;font-size:0.95rem;">Themed journeys through the 2000s, one era at a time.</p>
+    </div>
+
+    <!-- FEATURED -->
+    <div class="mb-5 anim-fade-up delay-1">
+      <div class="section-head">
+        <h2 class="section-title">Featured Playlist</h2>
+      </div>
+      <a href="player.html" class="playlist-hero-card">
+        <div class="ph-bg" style="background:linear-gradient(135deg,#111118 0%,#1c1c2e 40%,#2d1b4e 100%);"></div>
+        <img src="images/hero-bg.svg" alt="Ultimate 2000s Hits - curated playlist featuring the biggest songs of the decade" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.15;pointer-events:none;" />
+        <div class="ph-overlay"></div>
+        <span class="ph-emoji">🏆</span>
+        <div class="ph-content">
+          <span class="pill pill-green mb-3">Editor's Pick</span>
+          <h2 style="font-size:2rem;font-weight:900;letter-spacing:-0.05em;color:#fff;margin:0 0 0.4rem;">Ultimate 2000s Hits</h2>
+          <p style="color:rgba(255,255,255,0.55);margin:0 0 1.2rem;font-size:0.9rem;">25 tracks · 1 hr 42 min · All genres</p>
+          <span class="btn-primary-music" style="pointer-events:none;">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l10 6-10 6V2z"/></svg>
+            Play
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <!-- GRID -->
+    <div class="anim-fade-up delay-2">
+      <div class="section-head">
+        <h2 class="section-title">All Playlists</h2>
+      </div>
+      <div class="row g-3" id="playlistGrid"></div>
+    </div>
+
+    <div style="height:3rem;"></div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/components.js"></script>
+<script>
+  document.getElementById('navbar-placeholder').innerHTML = getNavHTML('playlists');
+  document.getElementById('footer-placeholder').innerHTML = getFooterHTML();
+
+  const playlists = [
+    {
+      emoji:'🎤', title:'Hip-Hop Royalty', sub:'15 tracks',
+      bg:'linear-gradient(135deg,#200000,#4a0000)',
+      desc:'The hottest rap tracks from the decade that made hip-hop the planet\'s dominant genre.',
+      tracks:['Lose Yourself — Eminem','Gold Digger — Kanye West','Yeah! — Usher ft. Lil Jon','Drop It Like It\'s Hot — Snoop Dogg','The Real Slim Shady — Eminem'],
+    },
+    {
+      emoji:'🎸', title:'Rock & Emo Revival', sub:'14 tracks',
+      bg:'linear-gradient(135deg,#001500,#003000)',
+      desc:'Nu-metal, pop-punk, and emo anthems that filled MySpace pages and Warped Tour stages.',
+      tracks:['In The End — Linkin Park','Welcome To The Black Parade — MCR','Mr. Brightside — The Killers','Sk8er Boi — Avril Lavigne','Numb — Linkin Park'],
+    },
+    {
+      emoji:'💫', title:'R&B Queens', sub:'13 tracks',
+      bg:'linear-gradient(135deg,#100020,#280050)',
+      desc:'Beyoncé, Rihanna, Alicia Keys — the women who ruled R&B in the 2000s.',
+      tracks:['Crazy In Love — Beyoncé','Umbrella — Rihanna','1, 2 Step — Ciara','Irreplaceable — Beyoncé','Halo — Beyoncé'],
+    },
+    {
+      emoji:'🌅', title:'Late Night Drive', sub:'12 tracks',
+      bg:'linear-gradient(135deg,#001010,#002828)',
+      desc:'Smooth, atmospheric tracks for a midnight cruise through empty city streets.',
+      tracks:['Beautiful Day — U2','The Scientist — Coldplay','Crazy — Gnarls Barkley','Say It Right — Nelly Furtado','Fallin\' — Alicia Keys'],
+    },
+    {
+      emoji:'🔥', title:'Party Starters', sub:'18 tracks',
+      bg:'linear-gradient(135deg,#1a0800,#3d1800)',
+      desc:'Songs that emptied dance floors and filled them right back up. Pure energy.',
+      tracks:['Hey Ya! — OutKast','Since U Been Gone — Kelly Clarkson','Toxic — Britney Spears','Hips Don\'t Lie — Shakira','In Da Club — 50 Cent'],
+    },
+    {
+      emoji:'😢', title:'Heartbreak Hotel', sub:'11 tracks',
+      bg:'linear-gradient(135deg,#000a1a,#001030)',
+      desc:'The ballads that had you texting your ex at 2am. Handle with care.',
+      tracks:['Boulevard of Broken Dreams — Green Day','My Immortal — Evanescence','How To Save A Life — The Fray','Breathe (2 AM) — Anna Nalick','Breakaway — Kelly Clarkson'],
+    },
+    {
+      emoji:'📻', title:'TRL Legends', sub:'20 tracks',
+      bg:'linear-gradient(135deg,#0a0016,#1a0038)',
+      desc:'Songs that dominated MTV\'s Total Request Live and defined pop culture for millions of teens.',
+      tracks:['Toxic — Britney Spears','In Da Club — 50 Cent','Beautiful — Christina Aguilera','Crazy In Love — Beyoncé','Lose Yourself — Eminem'],
+    },
+    {
+      emoji:'🎮', title:'Nostalgia Unlocked', sub:'16 tracks',
+      bg:'linear-gradient(135deg,#001a0a,#003a16)',
+      desc:'Songs that instantly teleport you back to AIM chats, Sidekick phones, and RAZR ringtones.',
+      tracks:['All Star — Smash Mouth','Yeah! — Usher','Mr. Brightside — The Killers','Hey Ya! — OutKast','Stacy\'s Mom — Fountains of Wayne'],
+    },
+  ];
+
+  document.getElementById('playlistGrid').innerHTML = playlists.map(p => `
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <a href="player.html" class="playlist-grid-card">
+        <div class="pg-art" style="background:${p.bg};">
+          <span>${p.emoji}</span>
+          <div class="pg-play">▶</div>
+        </div>
+        <div class="pg-body">
+          <div class="pg-title">${p.title}</div>
+          <div class="pg-sub">${p.sub}</div>
+        </div>
+      </a>
+    </div>
+  `).join('');
+</script>
+</body>
+</html>

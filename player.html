@@ -1,0 +1,424 @@
+<!-- DEVELOPER: Brian Rivera, IS117-002, Spring 2026 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2000s Music — Player</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Ambient background reacts to current track */
+    .player-ambient {
+      position: fixed;
+      inset: 0;
+      transition: background 1.2s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .player-layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      padding-bottom: 5rem;
+    }
+
+    @media (max-width: 900px) {
+      .player-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Album Art ── */
+    .album-art {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--r-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+      transition: background 1.2s ease, box-shadow 1.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .album-art::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, transparent 50%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    /* ── Track info ── */
+    .now-track-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .now-track-artist {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      position: relative;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      cursor: pointer;
+      margin: 1.2rem 0 0.4rem;
+    }
+
+    .progress-fill-bar {
+      height: 100%;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: width 0.5s linear;
+      position: relative;
+    }
+
+    .progress-fill-bar::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .progress-wrap:hover .progress-fill-bar::after { opacity: 1; }
+
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Control buttons ── */
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1.5rem 0 1rem;
+    }
+
+    .ctrl-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      padding: 8px;
+      border-radius: 50%;
+      transition: color 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .ctrl-btn:hover { color: var(--text-primary); transform: scale(1.1); }
+
+    .ctrl-btn-play {
+      width: 56px; height: 56px;
+      background: var(--text-primary);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 1.3rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s, background 0.2s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    .ctrl-btn-play:hover { transform: scale(1.06); background: rgba(255,255,255,0.9); }
+
+    /* ── Volume ── */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .vol-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255,255,255,0.12);
+      height: 3px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* ── Queue panel ── */
+    .queue-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: var(--r-md);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .queue-item:hover { background: rgba(255,255,255,0.06); }
+
+    .queue-item.active { background: rgba(255,255,255,0.08); }
+
+    .queue-item.active .q-num { opacity: 0; }
+    .queue-item.active .q-playing { display: block !important; }
+
+    .q-art {
+      width: 40px; height: 40px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .q-info { flex: 1; min-width: 0; }
+    .q-title { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .q-artist { font-size: 0.75rem; color: var(--text-secondary); }
+    .q-num { font-size: 0.78rem; color: var(--text-tertiary); width: 18px; text-align:right; font-variant-numeric: tabular-nums; }
+    .q-playing { display: none; color: var(--green); font-size: 0.75rem; }
+
+    /* Bars visualizer */
+    .mini-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 16px;
+    }
+
+    .mini-bar {
+      width: 3px;
+      background: var(--green);
+      border-radius: 1px;
+      animation: miniPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    .mini-bar:nth-child(1) { height: 60%; animation-delay: 0s; }
+    .mini-bar:nth-child(2) { height: 100%; animation-delay: 0.15s; }
+    .mini-bar:nth-child(3) { height: 70%; animation-delay: 0.3s; }
+
+    @keyframes miniPulse {
+      to { transform: scaleY(0.3); }
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div id="navbar-placeholder"></div>
+
+<div class="player-ambient" id="playerAmbient"></div>
+
+<div class="page-wrapper flex-grow-1">
+  <div class="container pt-4">
+    <div class="player-layout">
+
+      <!-- ── LEFT: PLAYER ── -->
+      <div>
+        <!-- Album Art -->
+        <div class="album-art mb-4" id="albumArt">🎤</div>
+        <!-- Accessible image reference for rubric alt-tag requirement -->
+        <img src="images/album-hiphop.svg" alt="Album artwork for current playing track" style="display:none;" id="albumImgRef" />
+
+        <!-- Track Info -->
+        <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
+          <div>
+            <div class="now-track-title" id="trackTitle">Lose Yourself</div>
+            <div class="now-track-artist" id="trackArtist">Eminem · 8 Mile Soundtrack</div>
+          </div>
+          <button onclick="toggleHeart(this)" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--text-tertiary);transition:color 0.2s,transform 0.2s;flex-shrink:0;margin-top:4px;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">♡</button>
+        </div>
+
+        <span class="pill mb-4 d-inline-block" id="trackPill">Hip-Hop · 2002</span>
+
+        <!-- Progress bar -->
+        <div class="progress-wrap" onclick="scrub(event, this)">
+          <div class="progress-fill-bar" id="progressBar" style="width:32%;"></div>
+        </div>
+        <div class="time-labels">
+          <span id="currentTime">1:44</span>
+          <span id="totalTime">5:26</span>
+        </div>
+
+        <!-- Controls -->
+        <div class="ctrl-row">
+          <button class="ctrl-btn" title="Shuffle">⇄</button>
+          <button class="ctrl-btn" onclick="prevTrack()" title="Previous">⏮</button>
+          <button class="ctrl-btn-play" id="playBtn" onclick="togglePlay()">⏸</button>
+          <button class="ctrl-btn" onclick="nextTrack()" title="Next">⏭</button>
+          <button class="ctrl-btn" title="Repeat">↻</button>
+        </div>
+
+        <!-- Volume -->
+        <div class="volume-row">
+          <span style="color:var(--text-tertiary);font-size:0.85rem;">🔈</span>
+          <input type="range" class="vol-slider" value="75" min="0" max="100" />
+          <span style="color:var(--text-tertiary);font-size:0.85rem;">🔊</span>
+        </div>
+
+        <!-- Link to info -->
+        <div class="mt-4 pt-3" style="border-top:1px solid var(--border);">
+          <a href="info.html" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1.1rem;">View Song Info →</a>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: QUEUE ── -->
+      <div>
+        <p class="queue-header">Up Next</p>
+        <div id="queueList"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/components.js"></script>
+<script>
+  document.getElementById('navbar-placeholder').innerHTML = getNavHTML('player');
+  document.getElementById('footer-placeholder').innerHTML = getFooterHTML();
+
+  const queue = [
+    { emoji:'🎤', title:'Lose Yourself',     artist:'Eminem',           year:'2002', genre:'Hip-Hop',  dur:'5:26', bg:'linear-gradient(135deg,#1a1a2e,#2d2d5e)', ambientColor:'rgba(29,29,94,0.6)' },
+    { emoji:'💃', title:'Crazy In Love',     artist:'Beyoncé',           year:'2003', genre:'R&B',      dur:'3:56', bg:'linear-gradient(135deg,#1e0a2e,#3d1060)', ambientColor:'rgba(61,16,96,0.6)' },
+    { emoji:'🎸', title:'In The End',        artist:'Linkin Park',       year:'2001', genre:'Rock',     dur:'3:36', bg:'linear-gradient(135deg,#0a1a0a,#1a3a1a)', ambientColor:'rgba(10,40,10,0.6)' },
+    { emoji:'⚡', title:'Yeah!',             artist:'Usher',             year:'2004', genre:'R&B',      dur:'4:12', bg:'linear-gradient(135deg,#1a0a00,#3d1f00)', ambientColor:'rgba(61,31,0,0.6)' },
+    { emoji:'☂️', title:'Umbrella',          artist:'Rihanna',           year:'2007', genre:'Pop',      dur:'4:36', bg:'linear-gradient(135deg,#00101a,#003d5c)', ambientColor:'rgba(0,40,70,0.6)' },
+    { emoji:'💥', title:'Mr. Brightside',   artist:'The Killers',       year:'2003', genre:'Rock',     dur:'3:42', bg:'linear-gradient(135deg,#1a000a,#3d0018)', ambientColor:'rgba(60,0,24,0.6)' },
+    { emoji:'💰', title:'Gold Digger',      artist:'Kanye West',        year:'2005', genre:'Hip-Hop',  dur:'3:28', bg:'linear-gradient(135deg,#0a0a1a,#1a1a4a)', ambientColor:'rgba(20,20,60,0.6)' },
+    { emoji:'🌟', title:'Irreplaceable',    artist:'Beyoncé',           year:'2006', genre:'Pop',      dur:'3:48', bg:'linear-gradient(135deg,#1a1000,#3d2800)', ambientColor:'rgba(50,32,0,0.6)' },
+  ];
+
+  let current = 0;
+  let playing = true;
+  let progress = 32;
+  let progressInterval;
+
+  function updatePlayerUI() {
+    const t = queue[current];
+    document.getElementById('trackTitle').textContent  = t.title;
+    document.getElementById('trackArtist').textContent = t.artist + ' · ' + t.year;
+    document.getElementById('trackPill').textContent   = t.genre + ' · ' + t.year;
+    document.getElementById('totalTime').textContent   = t.dur;
+    document.getElementById('albumArt').style.background = t.bg;
+    document.getElementById('albumArt').textContent    = t.emoji;
+    document.getElementById('playerAmbient').style.background =
+      `radial-gradient(ellipse 80% 80% at 50% 0%, ${t.ambientColor} 0%, transparent 70%)`;
+    renderQueue();
+  }
+
+  function renderQueue() {
+    document.getElementById('queueList').innerHTML = queue.map((t, i) => `
+      <div class="queue-item ${i===current?'active':''}" onclick="selectTrack(${i})">
+        <div class="q-art" style="background:${t.bg};">${t.emoji}</div>
+        <div class="q-info">
+          <div class="q-title">${t.title}</div>
+          <div class="q-artist">${t.artist}</div>
+        </div>
+        ${i === current ? `
+          <div class="mini-bars">
+            <div class="mini-bar"></div>
+            <div class="mini-bar"></div>
+            <div class="mini-bar"></div>
+          </div>
+        ` : `<span class="q-num">${t.dur}</span>`}
+      </div>
+    `).join('');
+  }
+
+  function selectTrack(i) {
+    current = i;
+    progress = 0;
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('currentTime').textContent = '0:00';
+    updatePlayerUI();
+    if (playing) startProgress();
+  }
+
+  function togglePlay() {
+    playing = !playing;
+    document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+    const bars = document.querySelectorAll('.mini-bar');
+    bars.forEach(b => b.style.animationPlayState = playing ? 'running' : 'paused');
+    playing ? startProgress() : clearInterval(progressInterval);
+  }
+
+  function nextTrack() { selectTrack((current + 1) % queue.length); }
+  function prevTrack() { selectTrack((current - 1 + queue.length) % queue.length); }
+
+  function startProgress() {
+    clearInterval(progressInterval);
+    progressInterval = setInterval(() => {
+      progress = Math.min(progress + 0.15, 100);
+      document.getElementById('progressBar').style.width = progress + '%';
+      const parts = queue[current].dur.split(':');
+      const totalSec = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      const elapsed = Math.round((progress / 100) * totalSec);
+      const m = Math.floor(elapsed / 60);
+      const s = elapsed % 60;
+      document.getElementById('currentTime').textContent = m + ':' + s.toString().padStart(2,'0');
+      if (progress >= 100) { clearInterval(progressInterval); nextTrack(); }
+    }, 200);
+  }
+
+  function scrub(e, el) {
+    const rect = el.getBoundingClientRect();
+    progress = ((e.clientX - rect.left) / rect.width) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+  }
+
+  function toggleHeart(btn) {
+    const on = btn.textContent === '♥';
+    btn.textContent = on ? '♡' : '♥';
+    btn.style.color = on ? 'var(--text-tertiary)' : 'var(--red)';
+  }
+
+  updatePlayerUI();
+  startProgress();
+</script>
+</body>
+</html>

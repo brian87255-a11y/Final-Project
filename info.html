@@ -1,0 +1,272 @@
+<!-- DEVELOPER: Brian Rivera, IS117-002, Spring 2026 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2000s Music — Song Info</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .song-tab {
+      background: none;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      border-radius: var(--r-full);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .song-tab:hover { color: var(--text-secondary); background: rgba(255,255,255,0.05); }
+    .song-tab.active { color: var(--text-primary); background: var(--surface); }
+
+    .info-art-panel {
+      aspect-ratio: 1;
+      border-radius: var(--r-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    .info-art-panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .meta-cell {
+      background: var(--surface);
+      padding: 1rem 1.2rem;
+    }
+
+    .meta-cell-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 5px;
+    }
+
+    .meta-cell-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .info-body {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      letter-spacing: -0.01em;
+    }
+
+    .info-body p { margin-bottom: 1.2rem; }
+    .info-body p:last-child { margin-bottom: 0; }
+
+    /* ambient bg */
+    .info-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      transition: background 1s ease;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div id="navbar-placeholder"></div>
+<div class="info-ambient" id="infoAmbient"></div>
+
+<div class="page-wrapper flex-grow-1">
+  <div class="container" style="position:relative;z-index:1;">
+
+    <div class="page-hero anim-fade-up">
+      <span class="eyebrow mb-2 d-block">Track Details</span>
+      <h1 style="font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-0.04em;">Song Info</h1>
+    </div>
+
+    <!-- SONG SELECTOR TABS -->
+    <div class="d-flex gap-1 flex-wrap mb-5 anim-fade-up delay-1" id="songTabs" style="background:rgba(255,255,255,0.03);padding:4px;border-radius:var(--r-full);display:inline-flex !important;width:fit-content;border:1px solid var(--border);"></div>
+
+    <!-- DETAIL LAYOUT -->
+    <div class="row g-4 anim-fade-up delay-2" id="songDetail"></div>
+
+    <div style="height:3rem;"></div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/components.js"></script>
+<script>
+  document.getElementById('navbar-placeholder').innerHTML = getNavHTML('info');
+  document.getElementById('footer-placeholder').innerHTML = getFooterHTML();
+
+  const songs = [
+    {
+      emoji: '🎤',
+      title: 'Lose Yourself',
+      artist: 'Eminem',
+      year: '2002',
+      album: '8 Mile: Music From and Inspired by the Motion Picture',
+      genre: 'Hip-Hop / Rap',
+      label: 'Shady / Aftermath / Interscope',
+      duration: '5:26',
+      bg: 'linear-gradient(135deg,#1a1a2e,#2d2d5e)',
+      ambient: 'rgba(29,29,94,0.35)',
+      tags: ['Grammy Winner', 'Oscar Winner', '#1 Billboard', 'Hip-Hop Classic'],
+      bio: `Marshall Bruce Mathers III—known as Eminem—was born in St. Joseph, Missouri, and raised in Detroit. He emerged as one of rap's most technically gifted lyricists in the late 1990s before becoming a global superstar in the 2000s. Known for rapid-fire rhyme schemes, complex wordplay, and raw autobiographical honesty, Eminem built a legacy that transcends genre. His album <em>The Marshall Mathers LP</em> sold over 1.76 million copies in its first week, a record for a solo artist at the time.`,
+      impact: `"Lose Yourself" was written, produced, and performed by Eminem for the 2002 film <em>8 Mile</em>, in which he starred as a rapper from Detroit fighting to escape poverty through music. The track opens with one of the most recognizable piano riffs in hip-hop history. Its themes of seizing a single moment of opportunity resonated universally—across classrooms, locker rooms, and arenas alike. It spent 12 non-consecutive weeks at #1 on the Billboard Hot 100 and became the first rap song to win the Academy Award for Best Original Song. The track is widely considered one of the greatest motivational songs ever recorded and remains a cultural touchstone over two decades later.`,
+    },
+    {
+      emoji: '💃',
+      title: 'Crazy In Love',
+      artist: 'Beyoncé ft. Jay-Z',
+      year: '2003',
+      album: 'Dangerously in Love',
+      genre: 'R&B / Pop',
+      label: 'Columbia',
+      duration: '3:56',
+      bg: 'linear-gradient(135deg,#1e0a2e,#3d1060)',
+      ambient: 'rgba(61,16,96,0.35)',
+      tags: ['Grammy Winner', '#1 Hit', 'Summer Anthem', 'Iconic Video'],
+      bio: `Beyoncé Giselle Knowles-Carter was born in Houston, Texas, and first rose to fame as the lead singer of Destiny's Child before launching one of music's most celebrated solo careers. She holds 32 Grammy Awards—the most of any artist in history—and is widely regarded as one of the greatest performers of all time. Known for complete artistic control over her work, visually stunning performances, and a relentless work ethic, Beyoncé has consistently redefined pop stardom.`,
+      impact: `"Crazy in Love" announced Beyoncé's solo arrival with unmistakable authority. Produced by Rich Harrison, the track samples The Chi-Lites' 1970 hit "Are You My Woman," flipping its horn riff into an explosive, unforgettable hook. Jay-Z's guest verse added hip-hop credibility and cemented the couple's power couple status. The music video—featuring Beyoncé dancing in a car yard as it explodes—became instantly iconic. The song debuted at #1 in both the US and UK simultaneously, a rarely achieved feat, and defined the sound of R&B for the mid-2000s.`,
+    },
+    {
+      emoji: '🎸',
+      title: 'In The End',
+      artist: 'Linkin Park',
+      year: '2001',
+      album: 'Hybrid Theory',
+      genre: 'Nu-Metal / Alt Rock',
+      label: 'Warner Bros.',
+      duration: '3:36',
+      bg: 'linear-gradient(135deg,#0a1a0a,#1a3a1a)',
+      ambient: 'rgba(10,40,10,0.35)',
+      tags: ['Gen Z Anthem', 'Multi-Platinum', 'Rock Classic', '5B+ Streams'],
+      bio: `Linkin Park formed in Agoura Hills, California in 1996, originally as Xero. Led by vocalist Chester Bennington and MC Mike Shinoda, the band pioneered a genre-crossing sound that fused heavy rock with hip-hop rhythms and electronic elements—dubbed "nu-metal." Their debut album <em>Hybrid Theory</em> became one of the best-selling albums of the 2000s and a definitive touchstone for an entire generation of alternative rock fans.`,
+      impact: `"In The End" closes Linkin Park's landmark debut <em>Hybrid Theory</em> on a quietly devastating note. Built around a melancholic piano riff composed by Mike Shinoda, the track grapples with feelings of futility—effort that goes unrewarded, time that slips away. Chester Bennington's soaring chorus—"I tried so hard, and got so far"—became a universal anthem for a generation. Initially not planned as a single, it leaked online and became a fan favorite before being officially released. It has since surpassed 5 billion streams on Spotify and remains one of the most-recognized rock songs of the 21st century.`,
+    },
+    {
+      emoji: '☂️',
+      title: 'Umbrella',
+      artist: 'Rihanna',
+      year: '2007',
+      album: 'Good Girl Gone Bad',
+      genre: 'Pop / R&B',
+      label: 'Def Jam',
+      duration: '4:36',
+      bg: 'linear-gradient(135deg,#00101a,#003d5c)',
+      ambient: 'rgba(0,40,70,0.35)',
+      tags: ['#1 Worldwide', 'Song of 2007', 'MTV VMA Winner', 'Global Smash'],
+      bio: `Robyn Rihanna Fenty was born in Saint Michael, Barbados, and signed to Def Jam Recordings at just 16 after being discovered by Jay-Z. She evolved rapidly from a Caribbean pop act into a global fashion and music icon. Rihanna's willingness to reinvent her sound—from dancehall to pop to electro R&B—made her one of the most versatile and best-selling artists of the 2000s and beyond. She holds the record as the best-selling digital singles artist of all time.`,
+      impact: `"Umbrella" was originally offered to Britney Spears and then Mary J. Blige before it found its true home with Rihanna—and became the defining moment of her career. Produced by Christopher "Tricky" Stewart and The-Dream, the song's hypnotic, sparse production and Rihanna's cool, detached delivery created a completely unique atmosphere. It reached #1 in over 15 countries, spent 10 consecutive weeks atop the UK Singles Chart, and was the best-selling single worldwide in 2007. The silver body-paint music video swept the MTV Video Music Awards. "Umbrella" transformed Rihanna from a promising pop act into a true global superstar overnight.`,
+    },
+  ];
+
+  let current = 0;
+
+  function renderTabs() {
+    document.getElementById('songTabs').innerHTML = songs.map((s, i) => `
+      <button class="song-tab ${i===current?'active':''}" onclick="select(${i})">${s.title}</button>
+    `).join('');
+  }
+
+  function renderDetail() {
+    const s = songs[current];
+    document.getElementById('infoAmbient').style.background =
+      `radial-gradient(ellipse 70% 60% at 30% 40%, ${s.ambient} 0%, transparent 65%)`;
+
+    document.getElementById('songDetail').innerHTML = `
+      <div class="col-lg-4">
+        <div class="info-art-panel mb-4" style="background:${s.bg};">${s.emoji}
+          <img src="images/album-${['hiphop','rb','rock','pop'][current]}.svg" alt="Album art for ${s.title} by ${s.artist}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;border-radius:inherit;" />
+        </div>
+
+        <div class="meta-grid mb-4">
+          <div class="meta-cell">
+            <div class="meta-cell-label">Artist</div>
+            <div class="meta-cell-value">${s.artist}</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-cell-label">Year</div>
+            <div class="meta-cell-value">${s.year}</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-cell-label">Genre</div>
+            <div class="meta-cell-value">${s.genre}</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-cell-label">Duration</div>
+            <div class="meta-cell-value">${s.duration}</div>
+          </div>
+          <div class="meta-cell" style="grid-column:span 2;">
+            <div class="meta-cell-label">Album</div>
+            <div class="meta-cell-value" style="font-size:0.82rem;white-space:normal;">${s.album}</div>
+          </div>
+          <div class="meta-cell" style="grid-column:span 2;">
+            <div class="meta-cell-label">Label</div>
+            <div class="meta-cell-value" style="font-size:0.85rem;">${s.label}</div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          ${s.tags.map(t => `<span class="pill pill-green">${t}</span>`).join('')}
+        </div>
+
+        <a href="player.html" class="btn-primary-music w-100 justify-content-center">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l10 6-10 6V2z"/></svg>
+          Play This Track
+        </a>
+      </div>
+
+      <div class="col-lg-8">
+        <div style="margin-bottom:2rem;">
+          <p class="eyebrow eyebrow-green mb-3">About the Artist</p>
+          <h2 style="font-size:1.6rem;font-weight:800;letter-spacing:-0.04em;margin-bottom:1.2rem;">${s.artist}</h2>
+          <div class="info-body">${s.bio}</div>
+        </div>
+
+        <hr class="divider my-4">
+
+        <div>
+          <p class="eyebrow eyebrow-green mb-3">Song History &amp; Cultural Impact</p>
+          <h3 style="font-size:1.2rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:1.2rem;">${s.title}</h3>
+          <div class="info-body">${s.impact}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function select(i) {
+    current = i;
+    renderTabs();
+    renderDetail();
+  }
+
+  renderTabs();
+  renderDetail();
+</script>
+</body>
+</html>

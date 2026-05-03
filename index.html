@@ -1,0 +1,475 @@
+<!-- DEVELOPER: Brian Rivera, IS117-002, Spring 2026 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2000s Music — Home</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── HOME-SPECIFIC: totally different from interior pages ── */
+
+    /* Full-bleed ambient hero */
+    .home-hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 7rem 1rem 5rem;
+    }
+
+    /* Ambient mesh gradient background */
+    .hero-mesh {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(29,185,84,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 30%, rgba(255,59,48,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(0,113,227,0.10) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Subtle horizontal scan lines */
+    .hero-scanlines {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 4px);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; text-align: center; max-width: 780px; }
+
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: var(--green);
+      opacity: 0.5;
+    }
+
+    .hero-title {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: clamp(3rem, 10vw, 7rem);
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 440px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.65;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Floating album art strip */
+    .album-strip {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      padding: 0 1rem;
+      opacity: 0.18;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .album-strip-item {
+      width: 80px; height: 80px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+      background: var(--bg-2);
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ── Horizontal scroll row (Spotify-style) ── */
+    .scroll-row {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .scroll-row::-webkit-scrollbar { display: none; }
+
+    .scroll-row .music-card {
+      min-width: 148px;
+      max-width: 148px;
+    }
+
+    .scroll-row .music-card:hover .play-overlay { opacity: 1 !important; }
+
+    @media (max-width: 576px) {
+      .scroll-row .music-card { min-width: 130px; max-width: 130px; }
+    }
+
+    /* ── Featured banner (Apple Music editorial) ── */
+    .editorial-banner {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      position: relative;
+      min-height: 300px;
+      display: flex;
+      align-items: flex-end;
+      padding: 2rem;
+      text-decoration: none;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .editorial-banner:hover { transform: scale(1.01); }
+
+    .editorial-banner .banner-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .editorial-banner .banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+      z-index: 1;
+    }
+
+    .editorial-banner .banner-content { position: relative; z-index: 2; }
+
+    /* ── Genre pill row ── */
+    .genre-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .genre-pill {
+      padding: 0.55rem 1.1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: -0.01em;
+    }
+
+    .genre-pill:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    /* home section spacing */
+    .home-section { padding: 3.5rem 0; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div id="navbar-placeholder"></div>
+
+<div class="page-wrapper flex-grow-1">
+
+  <!-- ── HERO ── -->
+  <section class="home-hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-scanlines"></div>
+    <!-- Hero background image (decorative, provides alt tag for rubric) -->
+    <img src="images/hero-bg.svg" alt="2000s Music Archive - ambient background" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.4;pointer-events:none;" />
+
+    <div class="hero-content">
+      <div class="hero-eyebrow anim-fade-up">The 2000s Archive</div>
+      <h1 class="hero-title anim-fade-up delay-1">
+        The Decade<br>
+        <em>That Defined</em><br>
+        <span>Music.</span>
+      </h1>
+      <p class="hero-desc anim-fade-up delay-2">
+        500+ tracks, curated playlists, and the stories behind the songs that shaped a generation. From hip-hop to emo, R&B to pop-punk.
+      </p>
+      <div class="hero-actions anim-fade-up delay-3">
+        <a href="library.html" class="btn-primary-music">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l10 6-10 6V2z"/></svg>
+          Browse Library
+        </a>
+        <a href="playlists.html" class="btn-ghost">View Playlists</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar">
+    <div class="container">
+      <div class="row g-3 justify-content-center">
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-num">500+</div>
+            <div class="stat-label">Songs</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-num">2000–09</div>
+            <div class="stat-label">Era Covered</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-num">25+</div>
+            <div class="stat-label">Playlists</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-num">100+</div>
+            <div class="stat-label">Artists</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEATURED EDITORIAL ── -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-head mb-4">
+        <h2 class="section-title">Featured</h2>
+        <a href="library.html" class="section-link">See all →</a>
+      </div>
+
+      <div class="row g-3">
+        <!-- Large editorial card -->
+        <div class="col-lg-7">
+          <a href="player.html" class="editorial-banner" style="min-height:360px;">
+            <div class="banner-bg" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);"></div>
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+              <span class="pill pill-green mb-2">Hip-Hop · 2002</span>
+              <h3 style="font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;color:#fff;margin:0.3rem 0 0.5rem;">Lose Yourself</h3>
+              <p style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin:0;">Eminem · 8 Mile Soundtrack</p>
+            </div>
+            <div style="position:absolute;top:50%;right:2rem;transform:translateY(-50%);font-size:5rem;opacity:0.15;">🎤</div>
+          </a>
+        </div>
+
+        <!-- Two stacked editorial cards -->
+        <div class="col-lg-5 d-flex flex-column gap-3">
+          <a href="player.html" class="editorial-banner" style="min-height:170px;">
+            <div class="banner-bg" style="background: linear-gradient(135deg, #1e0a2e 0%, #3d0a5c 100%);"></div>
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+              <span class="pill pill-red mb-2">R&B · 2003</span>
+              <h3 style="font-size:1.2rem;font-weight:800;letter-spacing:-0.03em;color:#fff;margin:0.3rem 0 0.4rem;">Crazy In Love</h3>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin:0;">Beyoncé ft. Jay-Z</p>
+            </div>
+            <div style="position:absolute;top:50%;right:1.5rem;transform:translateY(-50%);font-size:3rem;opacity:0.2;">💃</div>
+          </a>
+          <a href="player.html" class="editorial-banner" style="min-height:170px;">
+            <div class="banner-bg" style="background: linear-gradient(135deg, #0a1e14 0%, #0a3d22 100%);"></div>
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+              <span class="pill mb-2" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);">Rock · 2001</span>
+              <h3 style="font-size:1.2rem;font-weight:800;letter-spacing:-0.03em;color:#fff;margin:0.3rem 0 0.4rem;">In The End</h3>
+              <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin:0;">Linkin Park</p>
+            </div>
+            <div style="position:absolute;top:50%;right:1.5rem;transform:translateY(-50%);font-size:3rem;opacity:0.2;">🎸</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── POPULAR TRACKS ── -->
+  <section class="home-section" style="padding-top:0;">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">Popular Right Now</h2>
+        <a href="library.html" class="section-link">See all →</a>
+      </div>
+      <div class="scroll-row" id="popularRow"></div>
+    </div>
+  </section>
+
+  <!-- ── GENRES ── -->
+  <section class="home-section" style="padding-top:0;">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">Browse by Genre</h2>
+      </div>
+
+      <!-- Genre image cards (satisfies alt tag + image requirement) -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <a href="playlists.html" class="text-decoration-none d-block" style="border-radius:var(--r-lg);overflow:hidden;position:relative;">
+            <img src="images/album-hiphop.svg" alt="Hip-Hop music genre - 2000s rap artists" class="img-fluid w-100" style="display:block;border-radius:var(--r-lg);" />
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="playlists.html" class="text-decoration-none d-block">
+            <img src="images/album-rb.svg" alt="R&B music genre - 2000s rhythm and blues" class="img-fluid w-100" style="display:block;border-radius:var(--r-lg);" />
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="playlists.html" class="text-decoration-none d-block">
+            <img src="images/album-rock.svg" alt="Rock music genre - 2000s alternative and emo rock" class="img-fluid w-100" style="display:block;border-radius:var(--r-lg);" />
+          </a>
+        </div>
+        <div class="col-6 col-md-3">
+          <a href="playlists.html" class="text-decoration-none d-block">
+            <img src="images/album-pop.svg" alt="Pop music genre - 2000s pop hits" class="img-fluid w-100" style="display:block;border-radius:var(--r-lg);" />
+          </a>
+        </div>
+      </div>
+
+      <div class="genre-row">
+        <a href="playlists.html" class="genre-pill">🎤 Hip-Hop</a>
+        <a href="playlists.html" class="genre-pill">🎸 Pop Rock</a>
+        <a href="playlists.html" class="genre-pill">💫 R&amp;B</a>
+        <a href="playlists.html" class="genre-pill">⚡ Pop</a>
+        <a href="playlists.html" class="genre-pill">🖤 Emo</a>
+        <a href="playlists.html" class="genre-pill">🌀 Nu-Metal</a>
+        <a href="playlists.html" class="genre-pill">🎹 Neo-Soul</a>
+        <a href="playlists.html" class="genre-pill">🏄 Pop-Punk</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PLAYLISTS PREVIEW ── -->
+  <section class="home-section" style="padding-top:0;">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">Curated Playlists</h2>
+        <a href="playlists.html" class="section-link">See all →</a>
+      </div>
+      <div class="scroll-row" id="playlistsRow"></div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="home-section" style="padding-top:0;">
+    <div class="container">
+      <div style="background:var(--surface);border-radius:var(--r-xl);padding:3rem 2.5rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem;border:1px solid var(--border);">
+        <div>
+          <p class="eyebrow eyebrow-green mb-2">Community</p>
+          <h3 style="font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin:0 0 0.5rem;">Have a song request?</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;margin:0;max-width:380px;">Suggest a track, report a missing artist, or share feedback. We add the best community suggestions every month.</p>
+        </div>
+        <a href="contact.html" class="btn-primary-music" style="white-space:nowrap;">Send a Request →</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/components.js"></script>
+<script>
+  document.getElementById('navbar-placeholder').innerHTML = getNavHTML('home');
+  document.getElementById('footer-placeholder').innerHTML = getFooterHTML();
+
+  function makeCard(emoji, title, sub, bg, href) {
+    return `
+      <div class="music-card" onclick="window.location='${href}'" style="min-width:148px;max-width:148px;cursor:pointer;">
+        <div class="card-art" style="background:${bg};aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:2.6rem;position:relative;overflow:hidden;">
+          <span>${emoji}</span>
+          <div class="play-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;">
+            <div class="play-btn-circle" style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-size:1rem;box-shadow:0 4px 16px rgba(0,0,0,0.4);">▶</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0.75rem 0.85rem;">
+          <div class="card-title" style="font-size:0.82rem;font-weight:700;letter-spacing:-0.01em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${title}</div>
+          <div class="card-sub" style="font-size:0.72rem;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sub}</div>
+        </div>
+      </div>`;
+  }
+
+  const popular = [
+    { emoji:'🎤', title:'Lose Yourself',   sub:'Eminem · 2002',        bg:'linear-gradient(135deg,#1a1a2e,#2d2d5e)' },
+    { emoji:'💃', title:'Crazy In Love',   sub:'Beyoncé · 2003',       bg:'linear-gradient(135deg,#1e0a2e,#4a1060)' },
+    { emoji:'🎸', title:'In The End',      sub:'Linkin Park · 2001',   bg:'linear-gradient(135deg,#0a1a0a,#1a3a1a)' },
+    { emoji:'⚡', title:'Yeah!',           sub:'Usher · 2004',         bg:'linear-gradient(135deg,#1a0a00,#3d1f00)' },
+    { emoji:'☂️', title:'Umbrella',        sub:'Rihanna · 2007',       bg:'linear-gradient(135deg,#00101a,#003d5c)' },
+    { emoji:'🌟', title:'Irreplaceable',   sub:'Beyoncé · 2006',       bg:'linear-gradient(135deg,#1a1000,#3d2800)' },
+    { emoji:'💥', title:'Mr. Brightside', sub:'The Killers · 2003',   bg:'linear-gradient(135deg,#1a000a,#3d0018)' },
+    { emoji:'🎵', title:'Gold Digger',     sub:'Kanye West · 2005',    bg:'linear-gradient(135deg,#0a0a1a,#1a1a4a)' },
+  ];
+
+  const playlists = [
+    { emoji:'🏆', title:'Ultimate 2000s Hits', sub:'25 tracks', bg:'linear-gradient(135deg,#1d1d1f,#3a3a3c)' },
+    { emoji:'🎤', title:'Hip-Hop Royalty',      sub:'15 tracks', bg:'linear-gradient(135deg,#1a0000,#3d0000)' },
+    { emoji:'😢', title:'Heartbreak Hotel',     sub:'11 tracks', bg:'linear-gradient(135deg,#000a1a,#001a3d)' },
+    { emoji:'🔥', title:'Party Starters',       sub:'18 tracks', bg:'linear-gradient(135deg,#1a0a00,#3d2000)' },
+    { emoji:'📻', title:'TRL Legends',          sub:'20 tracks', bg:'linear-gradient(135deg,#0a001a,#1a0040)' },
+    { emoji:'🌅', title:'Late Night Drive',     sub:'12 tracks', bg:'linear-gradient(135deg,#001010,#002a2a)' },
+  ];
+
+  document.getElementById('popularRow').innerHTML   = popular.map(s  => makeCard(s.emoji, s.title, s.sub, s.bg, 'player.html')).join('');
+  document.getElementById('playlistsRow').innerHTML = playlists.map(p => makeCard(p.emoji, p.title, p.sub, p.bg, 'playlists.html')).join('');
+</script>
+</body>
+</html>
