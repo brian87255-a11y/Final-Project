@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap');
 
 :root {
-  /* Core palette */
+  /* Main palette colors */
   --bg:           #0a0a0a;
   --bg-2:         #111111;
   --bg-3:         #1a1a1a;
@@ -22,11 +22,10 @@
   --text-secondary: rgba(255,255,255,0.55);
   --text-tertiary:  rgba(255,255,255,0.28);
 
-  /* Glass */
   --glass:        rgba(28,28,30,0.72);
   --glass-border: rgba(255,255,255,0.1);
 
-  /* Typography */
+  /* Fonts */
   --font-sans: 'Figtree', system-ui, sans-serif;
   --font-serif: 'DM Serif Display', Georgia, serif;
 
@@ -51,7 +50,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── NOISE TEXTURE OVERLAY ── */
+/*   Texture overlay  */
 body::before {
   content: '';
   position: fixed;
@@ -62,9 +61,7 @@ body::before {
   opacity: 0.4;
 }
 
-/* ══════════════════════════════
-   NAVBAR
-══════════════════════════════ */
+/* Nav */
 .navbar {
   background: rgba(10,10,10,0.85) !important;
   backdrop-filter: saturate(180%) blur(20px);
@@ -153,14 +150,9 @@ body::before {
   filter: invert(1);
 }
 
-/* ══════════════════════════════
-   PAGE WRAPPER
-══════════════════════════════ */
+/* page wrapper */
 .page-wrapper { min-height: calc(100vh - 56px); }
 
-/* ══════════════════════════════
-   TYPOGRAPHY
-══════════════════════════════ */
 .display-title {
   font-family: var(--font-sans);
   font-weight: 900;
@@ -188,9 +180,7 @@ body::before {
   color: var(--green);
 }
 
-/* ══════════════════════════════
-   CARDS
-══════════════════════════════ */
+/* cards */
 .music-card {
   background: var(--surface);
   border-radius: var(--r-lg);
@@ -267,9 +257,7 @@ body::before {
   text-overflow: ellipsis;
 }
 
-/* ══════════════════════════════
-   SECTION HEADERS
-══════════════════════════════ */
+/* headers */
 .section-head {
   display: flex;
   align-items: baseline;
@@ -294,9 +282,7 @@ body::before {
 
 .section-head .section-link:hover { color: var(--text-primary); }
 
-/* ══════════════════════════════
-   BUTTONS
-══════════════════════════════ */
+/* buttons */
 .btn-primary-music {
   background: var(--text-primary);
   color: var(--bg);
@@ -367,9 +353,7 @@ body::before {
   border-color: var(--border-hover);
 }
 
-/* ══════════════════════════════
-   TRACK ROW
-══════════════════════════════ */
+/* track */
 .track-row {
   display: grid;
   grid-template-columns: 40px 44px 1fr auto auto;
@@ -453,9 +437,7 @@ body::before {
   border-radius: var(--r-xl);
 }
 
-/* ══════════════════════════════
-   PILL TAGS
-══════════════════════════════ */
+/* pill */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -491,18 +473,14 @@ body::before {
   display: block;
 }
 
-/* ══════════════════════════════
-   DIVIDER
-══════════════════════════════ */
+
 .divider {
   border: none;
   border-top: 1px solid var(--border);
   margin: 0;
 }
 
-/* ══════════════════════════════
-   FOOTER
-══════════════════════════════ */
+/* footer */
 footer {
   background: var(--bg-2) !important;
   border-top: 1px solid var(--border);
@@ -535,9 +513,7 @@ footer .footer-copy {
   color: var(--text-tertiary);
 }
 
-/* ══════════════════════════════
-   FORM
-══════════════════════════════ */
+/* forms */
 .music-form .form-label {
   font-size: 0.78rem;
   font-weight: 600;
@@ -580,16 +556,12 @@ footer .footer-copy {
   border-color: var(--green);
 }
 
-/* ══════════════════════════════
-   SCROLLBAR
-══════════════════════════════ */
+/* scrollbars */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
-/* ══════════════════════════════
-   ANIMATIONS
-══════════════════════════════ */
+/* some animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -607,9 +579,7 @@ footer .footer-copy {
 .delay-3 { animation-delay: 0.3s; }
 .delay-4 { animation-delay: 0.4s; }
 
-/* ══════════════════════════════
-   RESPONSIVE
-══════════════════════════════ */
+/* @ media for the responsiveness  */
 @media (max-width: 768px) {
   .track-row { grid-template-columns: 28px 40px 1fr auto; }
   .track-genre-tag { display: none; }
